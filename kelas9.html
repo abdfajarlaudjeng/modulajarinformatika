@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Modul Informatika Kelas 9: Hardware, Software, Brainware, Sistem Operasi</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: #f3f6fa;
+      color: #222;
+      height: 100%;
+    }
+    .container {
+      display: flex;
+      min-height: 100vh;
+    }
+    .sidebar {
+      background: #0d47a1;
+      width: 250px;
+      min-width: 180px;
+      color: #fff;
+      padding-top: 32px;
+      box-shadow: 2px 0 8px #cfd8dc33;
+      position: fixed;
+      height: 100%;
+      left: 0;
+      top: 0;
+      z-index: 2;
+    }
+    .sidebar h2 {
+      text-align: center;
+      font-size: 20px;
+      margin-bottom: 36px;
+      letter-spacing: 1px;
+    }
+    .nav-btn {
+      display: block;
+      width: 90%;
+      margin: 0 auto 18px auto;
+      padding: 13px 0;
+      background: #1976d2;
+      border: none;
+      color: #fff;
+      font-size: 16px;
+      border-radius: 7px;
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.2s;
+    }
+    .nav-btn.active, .nav-btn:hover {
+      background: #fbbf24;
+      color: #0d47a1;
+    }
+    .content {
+      margin-left: 250px;
+      padding: 36px 5% 36px 5%;
+      width: 100%;
+      max-width: 950px;
+    }
+    h1 {
+      color: #0d47a1;
+      font-size: 2em;
+      margin-bottom: 10px;
+    }
+    h2 {
+      color: #0d47a1;
+      margin-top: 40px;
+      margin-bottom: 12px;
+    }
+    .media {
+      text-align: center;
+      margin: 20px 0;
+    }
+    img {
+      max-width: 85%;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px #bbb;
+      margin-bottom: 6px;
+    }
+    .aktivitas, .latihan, .kuis, .refleksi {
+      background: #fff8e1;
+      padding: 18px;
+      border-radius: 10px;
+      margin: 18px 0;
+      box-shadow: 0 2px 7px #e3e3e3;
+    }
+    a, a:visited {
+      color: #174ea6;
+      text-decoration: underline;
+    }
+    .kuis button {
+      background: #1976d2;
+      color: #fff;
+      padding: 7px 17px;
+      border: none;
+      border-radius: 6px;
+      margin-top: 8px;
+      cursor: pointer;
+    }
+    .jawaban {
+      display: none;
+      margin-top: 8px;
+      background: #e3f2fd;
+      padding: 10px;
+      border-radius: 7px;
+    }
+    @media (max-width: 1000px) {
+      .sidebar { position: static; width: 100vw; display: flex; height: auto; box-shadow: none; flex-direction: row;}
+      .sidebar h2 { display: none; }
+      .nav-btn { margin: 6px 4px; width: 100%; border-radius: 0;}
+      .content { margin-left: 0; padding: 18px 5%;}
+    }
+  </style>
+  <script>
+    function showSection(id) {
+      const sections = document.querySelectorAll('.section');
+      sections.forEach(sec => sec.style.display = 'none');
+      document.getElementById(id).style.display = 'block';
+
+      const btns = document.querySelectorAll('.nav-btn');
+      btns.forEach(b => b.classList.remove('active'));
+      document.getElementById('btn-' + id).classList.add('active');
+    }
+    function toggleJawaban(id) {
+      const el = document.getElementById(id);
+      el.style.display = el.style.display === "block" ? "none" : "block";
+    }
+    window.onload = function() {
+      showSection('hardware');
+    }
+  </script>
+</head>
+<body>
+<div class="container">
+  <nav class="sidebar">
+    <h2>Modul Informatika 9</h2>
+    <button class="nav-btn" id="btn-hardware" onclick="showSection('hardware')">Hardware</button>
+    <button class="nav-btn" id="btn-software" onclick="showSection('software')">Software</button>
+    <button class="nav-btn" id="btn-brainware" onclick="showSection('brainware')">Brainware</button>
+    <button class="nav-btn" id="btn-sistem" onclick="showSection('sistem')">Sistem Operasi</button>
+    <button class="nav-btn" id="btn-media" onclick="showSection('media')">Media & Kuis</button>
+    <button class="nav-btn" id="btn-refleksi" onclick="showSection('refleksi')">Refleksi</button>
+  </nav>
+  <main class="content">
+
+    <div id="hardware" class="section">
+      <h1>Hardware (Perangkat Keras)</h1>
+      <p>
+        Di kelas 9, hardware dikaitkan dengan perkembangan teknologi terbaru.<br>
+        Bahas juga <b>IoT (Internet of Things), perangkat mobile, dan hardware jaringan (router, switch, access point)</b>.
+      </p>
+      <div class="media">
+        <img src="https://cdn.pixabay.com/photo/2016/03/09/09/17/network-1246209_1280.jpg" alt="Jaringan komputer dan IoT">
+        <div><small>Gambar: Perangkat keras jaringan dan IoT</small></div>
+      </div>
+      <div class="aktivitas">
+        <b>Aktivitas:</b> Telusuri, apa itu perangkat IoT? Cari dan catat contoh perangkat IoT di rumah/sekolahmu!
+      </div>
+    </div>
+    <div id="software" class="section" style="display:none;">
+      <h1>Software (Perangkat Lunak)</h1>
+      <p>
+        Di kelas 9, bahas software berbasis web dan mobile.<br>
+        Contoh: <b>Aplikasi berbasis cloud (Google Docs), aplikasi Android/iOS, software keamanan (antivirus, firewall)</b>.
+      </p>
+      <div class="media">
+        <img src="https://cdn.pixabay.com/photo/2016/06/22/14/07/antivirus-1472853_1280.png" alt="Aplikasi mobile dan antivirus">
+        <div><small>Gambar: Logo aplikasi dan software keamanan</small></div>
+      </div>
+      <div class="aktivitas">
+        <b>Tugas:</b> Instal aplikasi produktivitas di ponselmu, lalu bandingkan fiturnya dengan aplikasi desktop!
+      </div>
+    </div>
+    <div id="brainware" class="section" style="display:none;">
+      <h1>Brainware</h1>
+      <p>
+        Brainware berkembang menjadi <b>pengembang aplikasi, admin IT, dan pengguna digital cerdas</b>.<br>
+        Diskusi etika digital, keamanan data, serta peran brainware di era digital.
+      </p>
+      <div class="media">
+        <img src="https://cdn.pixabay.com/photo/2016/11/22/19/15/adult-1850177_1280.jpg" alt="Pengembang aplikasi dan admin IT">
+        <div><small>Gambar: Pengembang dan admin IT</small></div>
+      </div>
+      <div class="aktivitas">
+        <b>Diskusi:</b> Mengapa brainware harus memahami keamanan data dan etika penggunaan teknologi?
+      </div>
+    </div>
+    <div id="sistem" class="section" style="display:none;">
+      <h1>Sistem Operasi</h1>
+      <p>
+        Bahas sistem operasi pada berbagai perangkat: komputer, smartphone, IoT.<br>
+        Perbandingan OS: <b>Windows vs Linux vs Android vs iOS</b>. Fitur keamanan, update, dan open source.
+      </p>
+      <div class="media">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/7/74/Android_robot.svg" alt="Logo Android">
+        <div><small>Gambar: Logo sistem operasi mobile (Android)</small></div>
+      </div>
+      <div class="aktivitas">
+        <b>Aktivitas:</b> Identifikasi sistem operasi pada gadget yang kamu miliki. Apa kelebihan OS tersebut?
+      </div>
+    </div>
+    <div id="media" class="section" style="display:none;">
+      <h1>Media Ajar & Kuis</h1>
+      <ul>
+        <li>
+          <a href="https://www.youtube.com/watch?v=Q8TXgCzxEnw" target="_blank">Video: Apa Itu IoT?</a>
+        </li>
+        <li>
+          <a href="https://quizizz.com/id/admin/quiz/607d73d7e8c7c4001b4d0b4a/sistem-operasi-kelas-9" target="_blank">Kuis: Sistem Operasi Kelas 9</a>
+        </li>
+      </ul>
+      <div class="kuis">
+        <strong>Mini Kuis:</strong>
+        <ol>
+          <li>
+            Sebutkan 2 contoh perangkat lunak berbasis cloud!
+            <br>
+            <button onclick="toggleJawaban('k9-1')">Lihat Jawaban</button>
+            <div class="jawaban" id="k9-1">Google Docs, Dropbox, Canva.</div>
+          </li>
+          <li>
+            Apa keuntungan menggunakan sistem operasi open source?
+            <br>
+            <button onclick="toggleJawaban('k9-2')">Lihat Jawaban</button>
+            <div class="jawaban" id="k9-2">Bebas dikembangkan, gratis, aman, komunitas besar.</div>
+          </li>
+        </ol>
+      </div>
+    </div>
+    <div id="refleksi" class="section" style="display:none;">
+      <h1>Refleksi & Penilaian Diri</h1>
+      <div class="refleksi">
+        <ol>
+          <li>Hal baru apa yang kamu pelajari tentang hardware, software, brainware, dan sistem operasi di kelas 9?</li>
+          <li>Bagian mana yang menurutmu paling menarik? Mengapa?</li>
+          <li>Tuliskan satu pertanyaan yang masih ingin kamu tanyakan tentang materi ini.</li>
+        </ol>
+        <p>Diskusikan hasil refleksi bersama teman kelompokmu atau guru!</p>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>
