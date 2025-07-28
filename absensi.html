@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Absensi Kehadiran Siswa SMP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { background: #f3f6fa; font-family: Arial, sans-serif; color: #222; margin: 0; min-height: 100vh; }
+    .container { max-width: 440px; margin: 38px auto; background: #fff; border-radius: 14px; box-shadow: 0 4px 16px #b3c3d6; padding: 26px 20px 32px 20px; }
+    h1 { color: #174ea6; text-align: center; margin-bottom: 8px;}
+    label { display: block; margin-top: 16px; margin-bottom: 7px; font-weight: bold;}
+    select, input, button { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 7px; border: 1px solid #c5cae9; }
+    button { background: #174ea6; color: #fff; border: none; font-weight: bold; font-size: 1.08em; cursor: pointer; margin-top: 12px; }
+    button:hover { background: #fbbf24; color:#174ea6; }
+    .lokasi { margin-top: 15px; margin-bottom: 15px; text-align: center;}
+    #map { width: 100%; height: 200px; margin-top: 7px; border-radius: 7px; }
+    .info { color: #388e3c; text-align: center; margin-top: 18px; }
+    .error { color: #d32f2f; text-align: center; margin-top: 15px;}
+    .footer { margin-top: 36px; color: #888; font-size: .98em; text-align: center;}
+    .photo-preview {text-align:center;}
+    .photo-preview img {max-width: 80%; border-radius:8px; margin-top:7px;}
+    .camera-btn {margin-bottom:7px;}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Absensi Kehadiran Siswa</h1>
+    <form id="absensiForm">
+      <label for="kelas">Kelas</label>
+      <select id="kelas" name="kelas" required onchange="updateNamaDropdown()">
+        <option value="">Pilih Kelas</option>
+        <option value="7">Kelas 7</option>
+        <option value="8">Kelas 8</option>
+        <option value="9">Kelas 9</option>
+      </select>
+
+      <label for="nama">Nama Lengkap</label>
+      <select id="nama" name="nama" required>
+        <option value="">Pilih Nama</option>
+      </select>
+
+      <label for="kehadiran">Status Kehadiran</label>
+      <select id="kehadiran" name="kehadiran" required>
+        <option value="">Pilih Status</option>
+        <option value="Hadir">Hadir</option>
+        <option value="Izin">Izin</option>
+        <option value="Sakit">Sakit</option>
+        <option value="Alpa">Alpa</option>
+      </select>
+
+      <div class="lokasi">
+        <label>Lokasi Kehadiran</label>
+        <button type="button" onclick="getLocation()">Ambil Lokasi</button>
+        <div id="lokasiStatus"></div>
+        <div id="map"></div>
+        <input type="hidden" id="latitude" name="latitude">
+        <input type="hidden" id="longitude" name="longitude">
+      </div>
+
+      <label for="foto">Foto Saat Absensi</label>
+      <div>
+        <button type="button" class="camera-btn" onclick="openCamera()">Ambil dari Kamera</button>
+        <input type="file" id="foto" name="foto" accept="image/*" capture="environment" onchange="previewFoto(event)">
+      </div>
+      <div class="photo-preview" id="photoPreview"></div>
+      <input type="hidden" id="fotoData" name="fotoData">
+
+      <button type="submit">Kirim Absensi</button>
+    </form>
+    <div class="info" id="info"></div>
+    <div class="error" id="error"></div>
+    <div class="footer">
+      &copy; 2025 Absensi Siswa SMP - Data otomatis ke Spreadsheet
+    </div>
+  </div>
+
+  <script>
+    // --- DAFTAR NAMA SISWA PER KELAS (GANTI SESUAI DATA SEKOLAH) ---
+    const daftarNama = {
+      "7": ["Ahmad Farel", "Nia Ramadhani", "Budi Santoso", "Siti Aminah"],
+      "8": ["Dian Prasetyo", "Rahmawati", "Agus Wibowo", "Rina Marlina"],
+      "9": ["Fajar Sidik", "Intan Permata", "Rizki Maulana", "Ayu Lestari"]
+    };
+
+    function updateNamaDropdown() {
+      const kelas = document.getElementById('kelas').value;
+      const namaSelect = document.getElementById('nama');
+      namaSelect.innerHTML = '<option value="">Pilih Nama</option>';
+      if(daftarNama[kelas]) {
+        daftarNama[kelas].forEach(nama => {
+          let opt = document.createElement('option');
+          opt.value = nama;
+          opt.innerText = nama;
+          namaSelect.appendChild(opt);
+        });
+      }
+    }
+
+    // --- FOTO: Kamera dan Upload ---
+    function openCamera() {
+      // Browser support input capture, so just trigger file input (mobile: camera, desktop: file)
+      document.getElementById('foto').click();
+    }
+    function previewFoto(event) {
+      const file = event.target.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('fotoData').value = e.target.result;
+        document.getElementById('photoPreview').innerHTML = `<img src="${e.target.result}" alt="Foto Absensi">`;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // --- LOKASI: Maps & Geolocation ---
+    let map, marker;
+    function getLocation() {
+      document.getElementById('lokasiStatus').innerText = "Mengambil lokasi...";
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition, showError, {enableHighAccuracy: true});
+      } else {
+        document.getElementById('lokasiStatus').innerText = "Geolocation tidak didukung browser ini.";
+      }
+    }
+    function showPosition(position) {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+      document.getElementById('latitude').value = lat;
+      document.getElementById('longitude').value = lng;
+      document.getElementById('lokasiStatus').innerText = `Lokasi berhasil diambil!`;
+      showMap(lat, lng);
+    }
+    function showMap(lat, lng) {
+      // Map menggunakan LeafletJS + OSM
+      if (!window.L) {
+        let script = document.createElement('script');
+        script.src = "https://unpkg.com/leaflet/dist/leaflet.js";
+        script.onload = () => renderMap(lat, lng);
+        document.head.appendChild(script);
+
+        let link = document.createElement('link');
+        link.rel = "stylesheet";
+        link.href = "https://unpkg.com/leaflet/dist/leaflet.css";
+        document.head.appendChild(link);
+      } else {
+        renderMap(lat, lng);
+      }
+    }
+    function renderMap(lat, lng) {
+      const mapDiv = document.getElementById('map');
+      mapDiv.style.height = '200px';
+      if (window.mapInstance) {
+        mapInstance.setView([lat, lng], 16);
+        if (window.markerInstance) {
+          markerInstance.setLatLng([lat, lng]);
+        } else {
+          window.markerInstance = L.marker([lat, lng]).addTo(mapInstance);
+        }
+      } else {
+        window.mapInstance = L.map('map').setView([lat, lng], 16);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>'
+        }).addTo(mapInstance);
+        window.markerInstance = L.marker([lat, lng]).addTo(mapInstance);
+      }
+    }
+    function showError(error) {
+      let msg = "";
+      switch(error.code) {
+        case error.PERMISSION_DENIED:
+          msg = "Izin lokasi diblokir. Aktifkan izin lokasi pada browser Anda.";
+          break;
+        case error.POSITION_UNAVAILABLE:
+          msg = "Info lokasi tidak tersedia.";
+          break;
+        case error.TIMEOUT:
+          msg = "Waktu permintaan lokasi habis.";
+          break;
+        default:
+          msg = "Terjadi kesalahan mengambil lokasi.";
+      }
+      document.getElementById('lokasiStatus').innerText = msg;
+    }
+
+    // --- SUBMIT FORM ---
+    // GANTI dengan URL Web App Google Apps Script Anda
+    const scriptURL = "https://script.google.com/macros/s/AKfycbx3R8pN1U8Mwn-QB3nN1xqWnJraD7d9y88QnS7yT9iTjF1D5iYm/exec";
+
+    document.getElementById('absensiForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      document.getElementById('info').innerText = "Mengirim absensi...";
+      document.getElementById('error').innerText = "";
+
+      // Validasi lokasi dan foto
+      if(!document.getElementById('latitude').value || !document.getElementById('longitude').value){
+        document.getElementById('error').innerText = "Ambil lokasi terlebih dahulu sebelum mengirim absensi!";
+        document.getElementById('info').innerText = "";
+        return;
+      }
+      if(!document.getElementById('fotoData').value){
+        document.getElementById('error').innerText = "Ambil atau upload foto terlebih dahulu!";
+        document.getElementById('info').innerText = "";
+        return;
+      }
+
+      // Kirim data
+      const formData = new FormData(this);
+      fetch(scriptURL, { method: 'POST', body: formData })
+        .then(response => {
+          document.getElementById('info').innerText = "Absensi berhasil dikirim! Terima kasih.";
+          document.getElementById('absensiForm').reset();
+          document.getElementById('map').innerHTML = '';
+          document.getElementById('lokasiStatus').innerHTML = '';
+          document.getElementById('photoPreview').innerHTML = '';
+        })
+        .catch(error => {
+          document.getElementById('error').innerText = "Gagal mengirim absensi. Coba lagi atau hubungi admin.";
+          document.getElementById('info').innerText = "";
+        });
+    });
+  </script>
+</body>
+</html>
