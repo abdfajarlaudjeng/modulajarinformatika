@@ -27,7 +27,7 @@
     <h1>Absensi Kehadiran Siswa</h1>
     <form id="absensiForm">
       <label for="kelas">Kelas</label>
-      <select id="kelas" name="kelas" required onchange="updateNamaDropdown()">
+      <select id="kelas" name="kelas" required>
         <option value="">Pilih Kelas</option>
         <option value="7">Kelas 7</option>
         <option value="8">Kelas 8</option>
@@ -75,15 +75,19 @@
   </div>
 
   <script>
-    // --- DAFTAR NAMA SISWA PER KELAS (GANTI SESUAI DATA SEKOLAH) ---
-    const daftarNama = {
-      "7": ["Ahmad Farel", "Nia Ramadhani", "Budi Santoso", "Siti Aminah"],
-      "8": ["Dian Prasetyo", "Rahmawati", "Agus Wibowo", "Rina Marlina"],
-      "9": ["Fajar Sidik", "Intan Permata", "Rizki Maulana", "Ayu Lestari"]
-    };
+    // Ganti dengan URL endpoint Apps Script GET untuk daftar nama
+    const namaSiswaURL = "https://script.google.com/macros/s/YOUR_WEBAPP_ID/exec";
+    // Ganti dengan URL endpoint Apps Script POST untuk absensi
+    const scriptURL = "https://script.google.com/macros/s/YOUR_WEBAPP_ID/exec";
 
-    function updateNamaDropdown() {
-      const kelas = document.getElementById('kelas').value;
+    let daftarNama = {7:[],8:[],9:[]};
+    fetch(namaSiswaURL)
+      .then(res => res.json())
+      .then(data => { daftarNama = data; })
+      .catch(()=>{});
+
+    document.getElementById('kelas').addEventListener('change', function(){
+      const kelas = this.value;
       const namaSelect = document.getElementById('nama');
       namaSelect.innerHTML = '<option value="">Pilih Nama</option>';
       if(daftarNama[kelas]) {
@@ -94,11 +98,9 @@
           namaSelect.appendChild(opt);
         });
       }
-    }
+    });
 
-    // --- FOTO: Kamera dan Upload ---
     function openCamera() {
-      // Browser support input capture, so just trigger file input (mobile: camera, desktop: file)
       document.getElementById('foto').click();
     }
     function previewFoto(event) {
@@ -112,8 +114,7 @@
       reader.readAsDataURL(file);
     }
 
-    // --- LOKASI: Maps & Geolocation ---
-    let map, marker;
+    // Lokasi & Maps
     function getLocation() {
       document.getElementById('lokasiStatus').innerText = "Mengambil lokasi...";
       if (navigator.geolocation) {
@@ -131,7 +132,6 @@
       showMap(lat, lng);
     }
     function showMap(lat, lng) {
-      // Map menggunakan LeafletJS + OSM
       if (!window.L) {
         let script = document.createElement('script');
         script.src = "https://unpkg.com/leaflet/dist/leaflet.js";
@@ -182,16 +182,12 @@
       document.getElementById('lokasiStatus').innerText = msg;
     }
 
-    // --- SUBMIT FORM ---
-    // GANTI dengan URL Web App Google Apps Script Anda
-    const scriptURL = "https://script.google.com/macros/s/AKfycbx3R8pN1U8Mwn-QB3nN1xqWnJraD7d9y88QnS7yT9iTjF1D5iYm/exec";
-
+    // Submit Form
     document.getElementById('absensiForm').addEventListener('submit', function(e){
       e.preventDefault();
       document.getElementById('info').innerText = "Mengirim absensi...";
       document.getElementById('error').innerText = "";
 
-      // Validasi lokasi dan foto
       if(!document.getElementById('latitude').value || !document.getElementById('longitude').value){
         document.getElementById('error').innerText = "Ambil lokasi terlebih dahulu sebelum mengirim absensi!";
         document.getElementById('info').innerText = "";
@@ -203,7 +199,6 @@
         return;
       }
 
-      // Kirim data
       const formData = new FormData(this);
       fetch(scriptURL, { method: 'POST', body: formData })
         .then(response => {
